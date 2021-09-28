@@ -9,7 +9,7 @@ CREATE TABLE products (
     name                varchar(100) not null,
     slogan              varchar(100) not null,
     description         varchar(200) not null,
-    category            varchar(50) not null,
+    category            varchar(50) not null --normalize, enumerate,
     default_price       varchar(20) not null
 );
 
@@ -25,7 +25,7 @@ CREATE TABLE styles (
     product_id          int references products(id) not null,
     name                varchar(100) not null,
     original_price      varchar(20) not null,
-    sale_price          varchar(20),
+    sale_price          varchar(20) -- always less, always pos,
     def                 boolean not null
 );
 
@@ -44,6 +44,7 @@ CREATE TABLE skus (
 );
 
 CREATE TABLE related (
+    -- maintain order
     id                  bigserial primary key,
     product_id          int references products(id) not null,
     related_product_id  int
