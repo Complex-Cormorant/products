@@ -34,4 +34,4 @@ const productSchema = new Schema({
     ],
     styles: [stylesSchema],
     related: [Number]
-})
+})l

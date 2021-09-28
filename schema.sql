@@ -9,8 +9,8 @@ CREATE TABLE products (
     name                varchar(100) not null,
     slogan              varchar(100) not null,
     description         varchar(200) not null,
-    category            varchar(50) not null --normalize, enumerate,
-    default_price       varchar(20) not null
+    category            varchar(50) not null,
+    default_price       int not null check (default_price > 0)
 );
 
 CREATE TABLE features (
@@ -24,8 +24,8 @@ CREATE TABLE styles (
     id                  bigserial primary key,
     product_id          int references products(id) not null,
     name                varchar(100) not null,
-    original_price      varchar(20) not null,
-    sale_price          varchar(20) -- always less, always pos,
+    original_price      int not null check (original_price > sale_price and original_price > 0),
+    sale_price          int check (sale_price = null or sale_price < original_price),
     def                 boolean not null
 );
 
