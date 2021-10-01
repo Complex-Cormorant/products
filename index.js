@@ -1,5 +1,5 @@
 const express = require('express');
-const fixData = require('./helper')
+const {fixStyles, fixProduct} = require('./helper')
 const app = express()
 const pool = require('./db');
 
@@ -17,16 +17,15 @@ app.get("/products", async (req, res) => {
     }
 })
 
-app.get("/products/:product_id", async (req, res) => {
+app.get('/products/:product_id', async (req, res) => {
     try {
-        const {product_id} = req.params;
-        const q1 = "SELECT * FROM products WHERE id = $1";
-        const products = await pool.query(q1, [product_id]);
-        const q2 = "SELECT * FROM features WHERE product_id = $1";
-        const features = await pool.query(q2, [product_id]);
-        res.json({...products.rows[0], features: features.rows});
+      const {product_id} = req.params;
+      const q1 = "SELECT * FROM products JOIN features ON products.id = features.product_id WHERE products.id = $1";
+      const unformatted = await pool.query(q1, [product_id]);
+      const formatted = await fixProduct(unformatted.rows);
+      res.json(formatted);
     } catch(err) {
-        console.error(err)
+      console.error(err);
     }
 })
 
@@ -34,9 +33,8 @@ app.get("/products/:product_id/styles", async (req, res) => {
     try {
         const {product_id} = req.params;
         const q1 = "SELECT * FROM styles JOIN photos ON styles.id = photos.style_id JOIN skus ON skus.style_id = styles.id WHERE styles.product_id = $1";
-        const results = await pool.query(q1, [product_id])
-        const formatted = await fixData(results.rows);
-        console.log(formatted);
+        const unformatted = await pool.query(q1, [product_id])
+        const formatted = await fixStyles(unformatted.rows);
         res.json(formatted)
     } catch(err) {
         console.error(err)
