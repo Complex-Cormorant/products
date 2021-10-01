@@ -1,4 +1,4 @@
-# Products Service for SDC Capstone
+# Products Service for SDC
 ## Josh Zigler
 
-![] (/images/products_response_time.png)
+![](/images/products_response_time.png)
