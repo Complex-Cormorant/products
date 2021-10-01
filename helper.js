@@ -34,13 +34,28 @@ const getSkus = (unformatted, style_id) => {
       return true;
   }).map(item => {
       let {size, quantity} = item;
-      console.log('size', size, 'quantity', quantity)
       return {size: size, quantity: quantity}
   })
   return skus;
 }
 
-const fixData = (unformatted) => {
+const getProduct = (unformatted) => {
+  const {feature, value, ...product} = unformatted[0];
+  return product;
+}
+
+const fixProduct = (unformatted) => {
+    const product = getProduct(unformatted);
+    const features = [];
+    for (let i = 0; i < unformatted.length; i++) {
+      const {feature, value} = unformatted[i];
+      features.push({feature: feature, value: value})
+    }
+    product.features = features;
+    return product;
+}
+
+const fixStyles = (unformatted) => {
     let styles = getStyles(unformatted);
     for (let i = 0; i < styles.length; i++) {
         let photos = getPhotos(unformatted, styles[i].style_id);
@@ -51,4 +66,5 @@ const fixData = (unformatted) => {
     return styles;
 }
 
-module.exports = fixData;
+module.exports.fixStyles = fixStyles;
+module.exports.fixProduct = fixProduct;
