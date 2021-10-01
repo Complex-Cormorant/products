@@ -1,4 +1,5 @@
 const express = require('express');
+const fixData = require('./helper')
 const app = express()
 const pool = require('./db');
 
@@ -31,18 +32,12 @@ app.get("/products/:product_id", async (req, res) => {
 
 app.get("/products/:product_id/styles", async (req, res) => {
     try {
-        // wrap queries up in a an async function?
         const {product_id} = req.params;
-        const q1 = "SELECT * FROM styles WHERE product_id = $1";
-        const styles = await pool.query(q1, [product_id]);
-        const q2 = "SELECT * FROM photos WHERE product_id = $1";
-        const photos = await pool.query(q2, [product_id]);
-        const q3 = "SELECT * FROM skus WHERE product_id = $1";
-        const skus = await pool.query(q3, [product_id]);
-        console.table(styles.rows);
-        console.table(photos.rows);
-        console.table(skus.rows);
-        res.send('cool')
+        const q1 = "SELECT * FROM styles JOIN photos ON styles.id = photos.style_id JOIN skus ON skus.style_id = styles.id WHERE styles.product_id = $1";
+        const results = await pool.query(q1, [product_id])
+        const formatted = await fixData(results.rows);
+        console.log(formatted);
+        res.json(formatted)
     } catch(err) {
         console.error(err)
     }
