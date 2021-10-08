@@ -5,10 +5,10 @@ const getStyles = (unformatted) => {
       flags[item.style_id] = true;
       return true;
   }).map(item => {
-       const {url, thumbnail_url, size, quantity, ...style} = item;
-       style.photos = [];
-       style.skus = [];
-       return style
+      const {url, thumbnail_url, size, quantity, ...style} = item;
+      style.photos = [];
+      style.skus = [];
+      return style
   })
   return styles
 }
