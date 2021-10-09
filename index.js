@@ -1,9 +1,14 @@
 const express = require('express');
 const {fixStyles, fixProduct} = require('./helper');
+const {loader_token} = require('./config');
 const app = express();
 const pool = require('./db');
 
-app.use(express.json())
+app.use(express.json());
+
+app.get(`/${loader_token}`, (req, res) => {
+  res.send(loader_token)
+});
 
 app.get("/products", async (req, res) => {
     try {
@@ -15,19 +20,51 @@ app.get("/products", async (req, res) => {
     } catch(err) {
         console.error(err);
     }
-})
+});
+
+// app.get('/products/:product_id', async (req, res) => {
+//     try {
+//       const {product_id} = req.params;
+//       const q1 = "SELECT * FROM products JOIN features ON products.id = features.product_id WHERE products.id = $1";
+//       const unformatted = await pool.query(q1, [product_id]);
+//       const formatted = await fixProduct(unformatted.rows);
+//       res.json(formatted);
+//     } catch(err) {
+//       console.error(err);
+//     }
+// });
 
 app.get('/products/:product_id', async (req, res) => {
-    try {
-      const {product_id} = req.params;
-      const q1 = "SELECT * FROM products JOIN features ON products.id = features.product_id WHERE products.id = $1";
-      const unformatted = await pool.query(q1, [product_id]);
-      const formatted = await fixProduct(unformatted.rows);
-      res.json(formatted);
-    } catch(err) {
-      console.error(err);
-    }
-})
+  try {
+    const {product_id} = req.params;
+    const unformatted = await pool.query(
+      `SELECT JSON_BUILD_OBJECT(
+        'id', products.id,
+        'name', products.name,
+        'slogan', products.slogan,
+        'description', products.description,
+        'category', products.category,
+        'default_price', products.default_price,
+        'features', (
+            SELECT JSON_AGG(
+                JSON_BUILD_OBJECT(
+                    'feature', features.feature,
+                    'value', features.value
+                )
+            )
+            FROM features
+            WHERE features.product_id = products.id
+        )
+      )
+      FROM products
+      WHERE products.id = ${product_id}
+      GROUP BY products.id`
+    )
+    res.json(unformatted.rows[0].json_build_object)
+  } catch(err) {
+    console.error(err);
+  }
+});
 
 // app.get("/products/:product_id/styles", async (req, res) => {
 //     try {
@@ -39,7 +76,7 @@ app.get('/products/:product_id', async (req, res) => {
 //     } catch(err) {
 //         console.error(err);
 //     }
-// })
+// });
 
 app.get("/products/:product_id/styles", async (req, res) => {
     try {
@@ -95,4 +132,4 @@ app.get("/products/:product_id/related", async (req, res) => {
 
 app.listen(3000, () => {
     console.log("listening on port 3000");
-})
+});

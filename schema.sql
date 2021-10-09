@@ -56,5 +56,12 @@ CREATE TABLE related (
 \COPY skus FROM 'data/skus.csv' WITH (FORMAT CSV, HEADER true, NULL 'null');
 \COPY related FROM 'data/related.csv' WITH (FORMAT CSV, HEADER true, NULL 'null');
 
+CREATE INDEX ON features(product_id);
+CREATE INDEX ON styles(product_id);
+CREATE INDEX ON photos(style_id);
+CREATE INDEX ON skus(style_id);
+CREATE INDEX ON related(product_id);
+
+
 
 
