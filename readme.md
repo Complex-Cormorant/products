@@ -2,7 +2,7 @@
 
 ## Response Times
 
-### "/products"
+### /products
 ![](images/products_response_time.png)
 
 ### /products/:product_id
@@ -13,4 +13,3 @@
 
 ### /products/:product_id/related
 ![](images/related_response_time.png)
-
